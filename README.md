@@ -6,10 +6,11 @@ This repo contains solutions to the mate challenge found at: http://mate-challen
 installation
 ------------
     
-    go get github.com/co0p/matechallengefive
+    go install github.com/co0p/matechallengefive
 
 usage
 -----
 
-    matechallengefive
+    cd $GOPATH/bin
+    ./matechallengefive
     
