@@ -1,44 +1,59 @@
-package solutions;
+package solutions
 
 import (
-	"net/http"
-	"log"
+	"bufio"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"net/http"
 	"net/url"
-	"bufio"
 	"os"
 )
+
+func getAnswer(question string) (string, error) {
+	fmt.Print(question)
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+
+	name := scanner.Text()
+	if len(name) < 1 {
+		return "", errors.New("No name given")
+	}
+	return name, nil
+}
+
+func Postdata(data url.Values) (string, error) {
+	resp, err := http.PostForm(URL, data)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
+}
 
 // Two posts you name to the url
 func Two() {
 
-	// read user name
-	fmt.Print("\n Please enter your name: ")
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	name := scanner.Text()
-
-	if (len(name) < 1) {
-		log.Fatal("You have to give me your name!")
+	name, err := getAnswer("your name please:")
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	data := url.Values{}
 	data.Add("name", name)
 
 	// make the post
-	resp, err := http.PostForm(URL, data)
-	if (err != nil) {
+	html, err := Postdata(data)
+	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
+	fmt.Println(html)
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if (err != nil) {
-		log.Fatal(err)
-	}
-
-	// print the solution
-	html := string(body);
-	fmt.Println(html);
 }
